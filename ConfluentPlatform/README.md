@@ -70,4 +70,4 @@ psql -U postgresql
 
 #### Topic naming Convention
 
-<Source>-<Stream/Signal/Event>-<Name>
+\[Source\]-\[Stream/Signal/Event\]-\[Name\]
