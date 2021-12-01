@@ -70,4 +70,6 @@ psql -U postgresql
 
 #### Topic naming Convention
 
+The topic name should convey the source of the data (device or service), the data type (signal, data stream or event) and the data entity (e.g. heart rate, exercise etc.)
+
 \[Source\]-\[Stream/Signal/Event\]-\[Name\]
