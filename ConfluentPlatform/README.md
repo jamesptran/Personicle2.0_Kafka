@@ -66,3 +66,8 @@ Then, run psql (no need to specify password unless connecting remotely):
 ```
 psql -U postgresql
 ```
+
+
+#### Topic naming Convention
+
+<Source>-<Stream/Signal/Event>-<Name>

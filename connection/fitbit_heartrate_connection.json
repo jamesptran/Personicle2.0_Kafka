@@ -2,7 +2,7 @@
     "name": "JdbcSinkConnectorConnector_1",
     "config": {
       "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
-      "topics": "fitbit_heartrate",
+      "topics": "fitbit_stream",
       "connection.url": "jdbc:postgresql://timescaledb:5432/testdb",
       "connection.user": "postgres",
       "connection.password": "password",

@@ -1,0 +1,19 @@
+{
+  "name": "JdbcSinkConnectorFitbitStreams",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "topics": "",
+    "topics.regex": ".*stream_heartrate",
+    "connection.url": "jdbc:postgresql://timescaledb:5432/testdb",
+    "connection.user": "postgres",
+    "connection.password": "password",
+    "dialect.name": "PostgreSqlDatabaseDialect",
+    "insert.mode": "insert",
+    "batch.size": "50",
+    "table.name.format": "kafka_heartrate",
+    "pk.mode": "none",
+    "auto.create": "true",
+    "auto.evolve": "true",
+    "quote.sql.identifiers": "always"
+  }
+}

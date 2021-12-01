@@ -45,6 +45,21 @@ services:
     #   - |
     #     /usr/bin/kafka-topics --create --topic test_event --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
 
+  init-kafka:
+    image: confluentinc/cp-server:7.0.0
+    depends_on:
+      - broker
+    command:
+      - bash
+      - -c
+      - |
+        # blocks until kafka is reachable
+        kafka-topics --bootstrap-server broker:29092 --list
+        echo -e 'Creating kafka topics'
+        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic fitbit_heartrate --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic events --replication-factor 1 --partitions 1
+        echo -e 'Successfully created the following topics:'
+        kafka-topics --bootstrap-server broker:29092 --list
 
   schema-registry:
     image: confluentinc/cp-schema-registry:7.0.0
@@ -96,6 +111,33 @@ services:
         echo "Launching Kafka Connect worker"
         /etc/confluent/docker/run &
         #
+        echo "Waiting for Kafka Connect to start listening on localhost ⏳"
+        while : ; do
+          curl_status=$$(curl -s -o /dev/null -w %{http_code} http://localhost:8083/connectors)
+          echo -e $$(date) " Kafka Connect listener HTTP state: " $$curl_status " (waiting for 200)"
+          if [ $$curl_status -eq 200 ] ; then
+            break
+          fi
+          sleep 5 
+        done
+        echo -e "\n--\n+> Creating connector"
+        # curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/mongo-connector/config \
+        curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/JdbcSinkConnectorFitbitStreams/config \
+            -d '{
+                  "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+                  "topics": "fitbit_stream",
+                  "connection.url": "jdbc:postgresql://timescaledb:5432/testdb",
+                  "connection.user": "postgres",
+                  "connection.password": "password",
+                  "dialect.name": "PostgreSqlDatabaseDialect",
+                  "insert.mode": "insert",
+                  "batch.size": "50",
+                  "table.name.format": "kafka_${topic}",
+                  "pk.mode": "none",
+                  "auto.create": "true",
+                  "auto.evolve": "true",
+                  "quote.sql.identifiers": "always"
+        }'
         sleep infinity
       # CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       # CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
@@ -103,7 +145,6 @@ services:
       # CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.0.0.jar
       # CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
       # CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
-      
 
   # connect:
   #   image: cnfldemos/cp-server-connect-datagen:0.5.0-6.2.0
