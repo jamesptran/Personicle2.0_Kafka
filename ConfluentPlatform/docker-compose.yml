@@ -125,18 +125,33 @@ services:
         curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/JdbcSinkConnectorFitbitStreams/config \
             -d '{
                   "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
-                  "topics": "fitbit_stream",
+                  "topics": "",
+                  "topics.regex": ".*stream_heartrate",
                   "connection.url": "jdbc:postgresql://timescaledb:5432/testdb",
                   "connection.user": "postgres",
                   "connection.password": "password",
                   "dialect.name": "PostgreSqlDatabaseDialect",
                   "insert.mode": "insert",
                   "batch.size": "50",
-                  "table.name.format": "kafka_${topic}",
+                  "table.name.format": "kafka_heartrate",
                   "pk.mode": "none",
                   "auto.create": "true",
                   "auto.evolve": "true",
                   "quote.sql.identifiers": "always"
+        }'
+        #
+        curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/JdbcSinkConnectorFitbitEvent/config \
+            -d '{
+                  "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+                  "topics.regex": ".*_event_.*",
+                  "connection.url": "jdbc:postgresql://timescaledb:5432/testdb",
+                  "connection.user": "postgres",
+                  "connection.password": "password",
+                  "dialect.name": "PostgreSqlDatabaseDialect",
+                  "batch.size": "3",
+                  "table.name.format": "kafka_event",
+                  "auto.create": "true",
+                  "auto.evolve": "true"
         }'
         sleep infinity
       # CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter

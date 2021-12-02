@@ -1,0 +1,15 @@
+{
+  "name": "JdbcSinkConnectorFitbitEvent",
+  "config": {
+    "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+    "topics.regex": ".*_event_.*",
+    "connection.url": "jdbc:postgresql://timescaledb:5432/testdb",
+    "connection.user": "postgres",
+    "connection.password": "password",
+    "dialect.name": "PostgreSqlDatabaseDialect",
+    "batch.size": "3",
+    "table.name.format": "kafka_event",
+    "auto.create": true,
+    "auto.evolve": true
+  }
+}
