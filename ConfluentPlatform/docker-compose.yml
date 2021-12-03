@@ -56,8 +56,8 @@ services:
         # blocks until kafka is reachable
         kafka-topics --bootstrap-server broker:29092 --list
         echo -e 'Creating kafka topics'
-        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic fitbit_heartrate --replication-factor 1 --partitions 1
-        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic events --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic fitbit_stream_heartrate --replication-factor 1 --partitions 1
+        kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic fitbit_events_activity --replication-factor 1 --partitions 1
         echo -e 'Successfully created the following topics:'
         kafka-topics --bootstrap-server broker:29092 --list
 
@@ -143,7 +143,7 @@ services:
         curl -s -X PUT -H  "Content-Type:application/json" http://localhost:8083/connectors/JdbcSinkConnectorFitbitEvent/config \
             -d '{
                   "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
-                  "topics.regex": ".*_event_.*",
+                  "topics.regex": ".*_events_.*",
                   "connection.url": "jdbc:postgresql://timescaledb:5432/testdb",
                   "connection.user": "postgres",
                   "connection.password": "password",
